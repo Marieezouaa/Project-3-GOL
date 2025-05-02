@@ -1,0 +1,73 @@
+body {
+  font-family: sans-serif;
+background: #252c45;
+  color: white;
+  margin: 0;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  background: #252c45;
+}
+
+.auth-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.auth-buttons a {
+  text-decoration: none;
+  padding: 0.55rem 1.5rem;
+  background-color: #5463ff;
+  color: white;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: background-color 0.2s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.auth-buttons a:hover {
+  background-color: #404eed;
+}
+
+#game-grid {
+  display: grid;
+  grid-template-columns: repeat(20, 24px);
+  grid-template-rows: repeat(20, 24px);
+  gap: 8px;
+  margin: 2rem auto;
+  width: fit-content;
+}
+
+.cell {
+  width: 27px;
+  height: 27px;
+  background-image: url("../assets/dead.png");
+  background-color: #96ACB7;
+  background-size: cover;
+  cursor: pointer;
+}
+
+.cell.alive {
+    background-color: #AF1B3F;
+  background-image: url("../assets/alive.png");
+}
+
+.controls {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.controls button {
+  margin: 5px;
+  padding: 0.5rem 1rem;
+  border: none;
+  background: #5463ff;
+  color: white;
+  font-weight: bold;
+  border-radius: 6px;
+}

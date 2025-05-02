@@ -1,0 +1,131 @@
+/* === Layout === */
+body {
+  margin: 0;
+  font-family: "Inter", sans-serif;
+  background: #f7f8fc;
+  color: #333;
+}
+
+.auth-container {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* === Form Section === */
+.auth-form {
+  flex: 1;
+  padding: 4rem 3rem;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.auth-form h2 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: #1a1a1a;
+}
+
+.auth-form p {
+  font-size: 1rem;
+  margin-bottom: 2.5rem;
+  color: #666;
+}
+
+.auth-form form {
+  display: flex;
+  flex-direction: column;
+}
+
+.auth-form input {
+  padding: 0.9rem 1rem;
+  margin-bottom: 1.4rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  background-color: #fafafa;
+  transition: border-color 0.2s;
+}
+
+.auth-form input:focus {
+  outline: none;
+  border-color: #5463ff;
+  background-color: #fff;
+}
+
+/* === Form Extras === */
+.auth-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+}
+
+.auth-options label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #444;
+}
+
+.auth-options a {
+  color: #5463ff;
+  text-decoration: none;
+}
+
+/* === Submit Button === */
+.auth-form button {
+  background-color: #5463ff;
+  color: #fff;
+  font-weight: bold;
+  padding: 0.9rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.auth-form button:hover {
+  background-color: #e46e2b;
+}
+
+/* === Account Switch Link === */
+.switch {
+  text-align: center;
+  margin-top: 1.4rem;
+  font-size: 0.95rem;
+}
+
+.switch a {
+  color: #5463ff;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* === Side Image Section === */
+.auth-image {
+  flex: 1;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* === Responsive Design === */
+@media screen and (max-width: 768px) {
+  .auth-container {
+    flex-direction: column;
+  }
+
+  .auth-image {
+    display: none;
+  }
+
+  .auth-form {
+    padding: 2rem;
+  }
+}
