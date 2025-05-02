@@ -30,7 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   <div class="auth-container">
     <div class="auth-form">
       <h2>Create Your Account</h2>
-      <p>Welcome! Let's get you started.</p>
+      <p>"Would you like to meet him? Would you like to meet Bitch Stewie?" - Stewie Griffin</p>
 
       <?php if (isset($error)): ?>
         <p style="color: red;"><?php echo $error; ?></p>

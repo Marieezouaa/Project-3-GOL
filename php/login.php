@@ -14,7 +14,7 @@ session_start();
   <div class="auth-container">
     <div class="auth-form">
       <h2>Login to Game of Life</h2>
-      <p>Welcome back! Please login to continue.</p>
+      <p>"Alright you undead bastards, time to send you back to hell! AHHHHH!!!!!" - Stewie Griffin</p>
 
       <form method="POST" action="login.php">
         <input type="text" name="username" placeholder="Username" required />
