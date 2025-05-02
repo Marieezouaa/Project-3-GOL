@@ -4,17 +4,20 @@ session_start();
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
   $username = $_POST["username"];
-  $password = password_hash($_POST["password"], PASSWORD_BCRYPT);
   $email = $_POST["email"];
+  $password = password_hash($_POST["password"], PASSWORD_BCRYPT);
 
   $stmt = $conn->prepare("INSERT INTO users (username, email, password) VALUES (?, ?, ?)");
   $stmt->bind_param("sss", $username, $email, $password);
 
   if ($stmt->execute()) {
-    header("Location: login.php");
+    // ✅ Redirect to game after successful registration
+    $_SESSION["user_id"] = $conn->insert_id;
+    $_SESSION["username"] = $username;
+    header("Location: ../index.html");
     exit();
   } else {
-    $error = "Registration failed.";
+    $error = "Registration failed. Please try again.";
   }
 }
 ?>
@@ -33,7 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       <p>"Would you like to meet him? Would you like to meet Bitch Stewie?" - Stewie Griffin</p>
 
       <?php if (isset($error)): ?>
-        <p style="color: red;"><?php echo $error; ?></p>
+        <p style="color: red; margin-bottom: 1rem;"><?php echo $error; ?></p>
       <?php endif; ?>
 
       <form method="POST" action="register.php">
