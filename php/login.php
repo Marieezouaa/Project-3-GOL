@@ -59,6 +59,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
           Don't have an account? <a href="register.php">Register</a>
         </div>
       </form>
+      
+      <div style="margin-top: 15px; text-align: center;">
+        <a href="../index.html">Return to Game</a>
+      </div>
     </div>
     <div class="auth-image" style="background-image: url('../assets/dead-Peter.png');"></div>
   </div>

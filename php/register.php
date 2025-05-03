@@ -49,6 +49,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
           Already have an account? <a href="login.php">Login</a>
         </div>
       </form>
+      
+      <div style="margin-top: 15px; text-align: center;">
+        <a href="../index.html">Return to Game</a>
+      </div>
     </div>
     <div class="auth-image" style="background-image: url('../assets/alive.png');"></div>
   </div>

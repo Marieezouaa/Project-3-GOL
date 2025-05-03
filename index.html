@@ -8,11 +8,13 @@
 
 <body>
     <div class="navbar">
-        <h1> Stewie's Game of Life</h1>
-    <div class="auth-buttons">
-        <a href="php/login.php">Login</a>
-        <a href="php/register.php">Register</a>
-    </div>
+        <h1>Stewie's Game of Life</h1>
+        <div class="auth-buttons">
+            <a href="php/login.php">Login</a>
+            <a href="php/register.php">Register</a>
+            <!-- Stats button will be added dynamically if user is logged in -->
+            <a href="php/stats.php" id="statsLink" style="display: none;">My Stats</a>
+        </div>
     </div>
 
     <div class="game-container">
@@ -26,6 +28,35 @@
             <button id="resetBtn">♻️ Reset</button>
         </div>
     </div>
+
+    <script>
+        // Check if user is logged in
+        fetch('php/check_login.php')
+            .then(response => response.json())
+            .then(data => {
+                if (data.logged_in) {
+                    // Show the stats link
+                    document.getElementById('statsLink').style.display = 'inline';
+                    
+                    // Update auth buttons
+                    const authButtons = document.querySelector('.auth-buttons');
+                    
+                    // Remove login and register links
+                    const loginLink = authButtons.querySelector('a[href="php/login.php"]');
+                    const registerLink = authButtons.querySelector('a[href="php/register.php"]');
+                    
+                    if (loginLink) loginLink.style.display = 'none';
+                    if (registerLink) registerLink.style.display = 'none';
+                    
+                    // Add logout link
+                    const logoutLink = document.createElement('a');
+                    logoutLink.href = 'php/logout.php';
+                    logoutLink.textContent = 'Logout';
+                    authButtons.appendChild(logoutLink);
+                }
+            })
+            .catch(error => console.error('Error checking login status:', error));
+    </script>
 
     <script src="js/app.js"></script>
 </body>

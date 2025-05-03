@@ -6,7 +6,11 @@ let nextGrid = [];
 let isRunning = false;
 let intervalId = null;
 let generation = 0;
+let currentPopulation = 0;
+let maxPopulation = 0;
 let gridElement = document.getElementById('game-grid');
+let currentPattern = null;
+let gameSessionId = null;
 
 // Initialize the game on document load
 document.addEventListener('DOMContentLoaded', function() {
@@ -26,6 +30,24 @@ document.addEventListener('DOMContentLoaded', function() {
     nextBtn.addEventListener('click', nextGeneration);
     gen23Btn.addEventListener('click', generate23);
     resetBtn.addEventListener('click', resetGame);
+    
+    // Add stats button to the navbar if user is logged in
+    const authButtons = document.querySelector('.auth-buttons');
+    if (authButtons && !authButtons.querySelector('.stats-link')) {
+        // Check if user is logged in by sending a request to a PHP script
+        fetch('php/check_login.php')
+            .then(response => response.json())
+            .then(data => {
+                if (data.logged_in) {
+                    const statsLink = document.createElement('a');
+                    statsLink.href = 'php/stats.php';
+                    statsLink.textContent = 'My Stats';
+                    statsLink.classList.add('stats-link');
+                    authButtons.insertBefore(statsLink, authButtons.firstChild);
+                }
+            })
+            .catch(error => console.error('Error checking login status:', error));
+    }
 });
 
 // Create the initial grid
@@ -65,8 +87,10 @@ function createGrid() {
         }
     }
     
-    // Reset generation counter
+    // Reset generation counter and population
     generation = 0;
+    currentPopulation = 0;
+    maxPopulation = 0;
     updateGenerationDisplay();
 }
 
@@ -77,6 +101,9 @@ function toggleCell(x, y) {
     
     // Update the cell appearance
     updateCellDisplay(x, y);
+    
+    // Update population count
+    updatePopulation();
 }
 
 // Update the visual appearance of a cell
@@ -94,6 +121,11 @@ function startGame() {
     if (!isRunning) {
         isRunning = true;
         intervalId = setInterval(nextGeneration, 200); // Update every 200ms
+        
+        // Create a new game session when starting
+        if (!gameSessionId) {
+            createGameSession();
+        }
     }
 }
 
@@ -102,6 +134,9 @@ function stopGame() {
     if (isRunning) {
         isRunning = false;
         clearInterval(intervalId);
+        
+        // Save the game session data when stopping
+        saveGameSession();
     }
 }
 
@@ -139,6 +174,14 @@ function nextGeneration() {
     // Increment generation count
     generation++;
     updateGenerationDisplay();
+    
+    // Update population count
+    updatePopulation();
+    
+    // Periodically save the game session data
+    if (generation % 10 === 0) {
+        saveGameSession();
+    }
 }
 
 // Count living neighbors around a cell
@@ -187,9 +230,15 @@ function resetGame() {
         }
     }
     
-    // Reset generation counter
+    // Reset generation counter and population
     generation = 0;
+    currentPopulation = 0;
+    maxPopulation = 0;
+    currentPattern = null;
     updateGenerationDisplay();
+    
+    // Create a new game session
+    gameSessionId = null;
 }
 
 // Run 23 generations quickly
@@ -202,19 +251,36 @@ function generate23() {
 
 // Update the generation display
 function updateGenerationDisplay() {
-    const genDisplay = document.createElement('div');
-    genDisplay.id = 'generationDisplay';
-    genDisplay.textContent = `Generation: ${generation}`;
+    let genDisplay = document.getElementById('generationDisplay');
     
-    // Remove any existing display
-    const oldDisplay = document.getElementById('generationDisplay');
-    if (oldDisplay) {
-        oldDisplay.remove();
+    if (!genDisplay) {
+        genDisplay = document.createElement('div');
+        genDisplay.id = 'generationDisplay';
+        
+        // Add the new display above the grid
+        const controls = document.querySelector('.controls');
+        controls.parentNode.insertBefore(genDisplay, controls);
     }
     
-    // Add the new display above the grid
-    const controls = document.querySelector('.controls');
-    controls.parentNode.insertBefore(genDisplay, controls);
+    genDisplay.innerHTML = `Generation: ${generation} | Population: ${currentPopulation}`;
+}
+
+// Update the population count
+function updatePopulation() {
+    currentPopulation = 0;
+    
+    // Count live cells
+    for (let y = 0; y < GRID_SIZE; y++) {
+        for (let x = 0; x < GRID_SIZE; x++) {
+            currentPopulation += grid[y][x];
+        }
+    }
+    
+    // Update max population if current is higher
+    maxPopulation = Math.max(maxPopulation, currentPopulation);
+    
+    // Update the display
+    updateGenerationDisplay();
 }
 
 // Pattern definitions for the required patterns
@@ -300,6 +366,9 @@ function loadPattern(patternName) {
     // Clear the grid first
     resetGame();
     
+    // Set the current pattern
+    currentPattern = patternName;
+    
     // Place the pattern
     for (let y = 0; y < pattern.length; y++) {
         for (let x = 0; x < pattern[y].length; x++) {
@@ -308,5 +377,73 @@ function loadPattern(patternName) {
                 updateCellDisplay(centerX + x, centerY + y);
             }
         }
+    }
+    
+    // Update population count
+    updatePopulation();
+    
+    // Create a new game session for this pattern
+    createGameSession();
+}
+
+// Create a new game session in the database
+function createGameSession() {
+    // Only create session if user is logged in
+    fetch('php/check_login.php')
+        .then(response => response.json())
+        .then(data => {
+            if (data.logged_in) {
+                // Create a new game session
+                const sessionData = {
+                    generations: generation,
+                    population: maxPopulation,
+                    pattern: currentPattern
+                };
+                
+                fetch('php/save_game.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(sessionData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        gameSessionId = data.session_id;
+                        console.log('Game session created:', gameSessionId);
+                    }
+                })
+                .catch(error => console.error('Error creating game session:', error));
+            }
+        })
+        .catch(error => console.error('Error checking login status:', error));
+}
+
+// Save game session data to the database
+function saveGameSession() {
+    // Only save if user is logged in and we have a session ID
+    if (gameSessionId) {
+        const sessionData = {
+            session_id: gameSessionId,
+            generations: generation,
+            population: maxPopulation,
+            pattern: currentPattern
+        };
+        
+        fetch('php/save_game.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(sessionData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log('Game session updated');
+            }
+        })
+        .catch(error => console.error('Error saving game session:', error));
     }
 }
