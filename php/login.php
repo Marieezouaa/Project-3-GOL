@@ -6,26 +6,34 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   $username = $_POST["username"];
   $password = $_POST["password"];
 
-  $stmt = $conn->prepare("SELECT id, password FROM users WHERE username = ?");
-  $stmt->bind_param("s", $username);
-  $stmt->execute();
-  $stmt->store_result();
+    $stmt = $conn->prepare("SELECT id, password, is_admin FROM users WHERE username = ?");
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $stmt->store_result();
 
-  if ($stmt->num_rows === 1) {
-    $stmt->bind_result($id, $hashedPassword);
-    $stmt->fetch();
+    if ($stmt->num_rows === 1) {
+      $stmt->bind_result($id, $hashedPassword, $isAdmin);
+      $stmt->fetch();
 
-    if (password_verify($password, $hashedPassword)) {
-      $_SESSION["user_id"] = $id;
-      $_SESSION["username"] = $username;
-      
-      // ✅ Redirect to game page after login
-      header("Location: ../index.html");
-      exit();
+      if (password_verify($password, $hashedPassword)) {
+        $_SESSION["user_id"] = $id;
+        $_SESSION["username"] = $username;
+        $_SESSION["admin_status"] = ($isAdmin == 1);
+   
+      if ($_SESSION["admin_status"]) {
+        // ✅ Redirect to admin page after login
+        header("Location: admin.php");
+        } else {
+        // ✅ Redirect to game page after login
+        header("Location: ../index.html");
+        }
+        exit();
+      } else {
+         $error = "Invalid username or password.";
+      }
+    } else {
+      $error = "Invalid username or password.";
     }
-  }
-
-  $error = "Invalid username or password.";
 }
 ?>
 <!DOCTYPE html>
